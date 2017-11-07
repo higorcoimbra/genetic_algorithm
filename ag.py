@@ -9,11 +9,6 @@ offset = 1500
 min_domain = -600
 max_domain = 600
 
-# global variables to evaluate ga behavior
-max_fitness = 0
-min_fitness = 2500
-mid_fitness = 0
-
 class Cromossome:
 	def __init__(self, x1, x2,fitness):
 		self.x1 = x1
@@ -31,15 +26,21 @@ def generate_population(pop_size):
 
 # generate fitness value for every cromossome in population
 def fitness(population):
+	max_fitness = 0
+	min_fitness = 2500
 	mid_fitness = 0
+	maior = Cromossome(0, 0, 0)
 	for c in population:
-		c.fitness = (-c.x2+47)*sin(sqrt(abs(c.x2+(c.x1/2)+47)))-c.x1*sin(sqrt(abs(c.x1-(c.x2+47))))
+		c.fitness = -(c.x2+47)*sin(sqrt(abs(c.x2+c.x1/2+47)))-c.x1*sin(sqrt(abs(c.x1-(c.x2+47))))
 		c.fitness = -c.fitness+offset
-		max_fitness = max(c.fitness,max_fitness)
-		min_fitness = min(c.fitness,min_fitness)
+		if (c.fitness > max_fitness):
+			max_fitness = c.fitness
+			maior = Cromossome(c.x1, c.x2, c.fitness)
+		min_fitness = min(c.fitness, min_fitness)
 		mid_fitness += c.fitness 
+
 	mid_fitness /= len(population)
-	return population
+	return [population, max_fitness, min_fitness, mid_fitness, maior]
 
 # selection process - roulette wheel
 def selection(population,pop_size):
@@ -50,6 +51,7 @@ def selection(population,pop_size):
 	for c in population:
 		value += c.fitness
 		roullete.append(value)
+
 	# selection with random number
 	selected_parents = []
 	for i in range(0,pop_size):
@@ -59,13 +61,16 @@ def selection(population,pop_size):
 				selected_parents.append(i-1)
 	return selected_parents
 
-def crossover(population, selected_parents, crossover_rate):
+def crossover(population, selected_parents, crossover_rate,elite):
 	sons = []
 	i = 0
 	while i < len(selected_parents):
 		alpha = random()
 		parents = [population[selected_parents[i]], population[selected_parents[i+1]]]
-		if(random() < crossover_rate):
+		if(i == 0):
+			son1 = elite
+			son2 = elite
+		elif(random() < crossover_rate):
 			son1 = Cromossome(0,0,0)
 			son2 = Cromossome(0,0,0)
 			son1.x1 = alpha*parents[0].x1+(1-alpha)*parents[1].x1
@@ -78,6 +83,7 @@ def crossover(population, selected_parents, crossover_rate):
 		sons.append(son1)
 		sons.append(son2)
 		i = i+2
+
 	return sons
 
 def mutacao(population, mutation_rate):
@@ -109,31 +115,34 @@ def print_population(population):
 	for c in population:
 		print(str(c.x1)+" "+str(c.x2))
 
-pop_size = 100
-crossover_rate = 0.7
+pop_size = 1000
+crossover_rate = 0.5
 mutation_rate = 0.1
 population = generate_population(pop_size)
-generations = 30
+generations = 200
 max_fitness_list = []
 mid_fitness_list = []
 min_fitness_list = []
+
+# evolution process
 for i in range(0,generations):
-	population = fitness(population)
+	fitness_atribs = fitness(population)
+	population = fitness_atribs[0]
 
 	# array operations for statistical analysis
-	max_fitness_list.append(max_fitness)
-	min_fitness_list.append(min_fitness)
-	mid_fitness_list.append(mid_fitness)
+	max_fitness_list.append(fitness_atribs[1])
+	min_fitness_list.append(fitness_atribs[2])
+	mid_fitness_list.append(fitness_atribs[3])
 	
-	# plot for statistical analysis
-	plt.plot(max_fitness_list)
-	plt.plot(mid_fitness_list)
-	plt.plot(min_fitness_list)
-	plt.show()
-
 	# general process of ga
 	selected_parents = selection(population,pop_size)
-	population = crossover(population, selected_parents, crossover_rate)
+	population = crossover(population, selected_parents, crossover_rate,fitness_atribs[4])
 	population = mutacao(population,mutation_rate)
 
+# plot for statistical analysis
+plt.plot(max_fitness_list)
+plt.plot(mid_fitness_list)
+plt.plot(min_fitness_list)
+plt.title("Plot da evolucao com elitismo. ")
+plt.show()
 
