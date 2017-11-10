@@ -61,13 +61,13 @@ def selection(population,pop_size):
 				selected_parents.append(i-1)
 	return selected_parents
 
-def crossover(population, selected_parents, crossover_rate,elite):
+def crossover(population, selected_parents, crossover_rate,elite,elite_bool):
 	sons = []
 	i = 0
 	while i < len(selected_parents):
 		alpha = random()
 		parents = [population[selected_parents[i]], population[selected_parents[i+1]]]
-		if(i == 0):
+		if(i == 0 and elite_bool):
 			son1 = elite
 			son2 = elite
 		elif(random() < crossover_rate):
@@ -116,10 +116,10 @@ def print_population(population):
 		print(str(c.x1)+" "+str(c.x2))
 
 pop_size = 1000
-crossover_rate = 0.5
+crossover_rate = 0.2
 mutation_rate = 0.1
 population = generate_population(pop_size)
-generations = 200
+generations = 400
 max_fitness_list = []
 mid_fitness_list = []
 min_fitness_list = []
@@ -136,13 +136,16 @@ for i in range(0,generations):
 	
 	# general process of ga
 	selected_parents = selection(population,pop_size)
-	population = crossover(population, selected_parents, crossover_rate,fitness_atribs[4])
+	population = crossover(population, selected_parents, crossover_rate,fitness_atribs[4],False)
 	population = mutacao(population,mutation_rate)
 
 # plot for statistical analysis
-plt.plot(max_fitness_list)
-plt.plot(mid_fitness_list)
-plt.plot(min_fitness_list)
-plt.title("Plot da evolucao com elitismo. ")
+plt.plot(max_fitness_list, label = 'Máximo fitness')
+plt.plot(mid_fitness_list, label = 'Fitness médio')
+plt.plot(min_fitness_list, label = 'Mínimo fitness')
+plt.title("Evolução sem elitismo")
+plt.xlabel("Gerações (n)")
+plt.ylabel("Valor da função objetivo com operação -f(x)+1500")
+plt.legend(loc = 2)
 plt.show()
 
