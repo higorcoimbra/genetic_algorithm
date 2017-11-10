@@ -1,0 +1,12 @@
+Centro Federal de Educação Tecnológica de Minas Gerais
+Engenharia de Computação
+Inteligencia Artificial - Algoritmo Genético
+Higor Amorim e Matheus Rosa
+
+O algoritmo genetico foi implementado em python. Para executar pelo terminal, basta entrar no diretorio do projeto e digitar o comando: python3 ag.py
+
+	Foram feitos diversos testes, para que o algoritmo pudesse ser melhorado, inclusive com o auxílio do professor. Dentre todos os testes realizados, os que 			apresentaram os melhores resultados foram:
+
+		1 - Testes com elitismo: neste teste, a cada geração mantemos o melhor indivíduo da população, visando manter as caraceterísticas de um bom indivíduo para os 		    cruzamentos das próximas gerações. O desempenho desse teste pode ser visualizado na imagem elitismo.png no diretório do projeto.
+
+		2 - Teste com baixa taxa de cruzamento: neste teste, diminuimos a taxa de cruzamento, visando manter o bom desempenho dos individuos com melhores resultados, 				evitando cruzá-los com individuos piores, o que estava fazendo com que os filhos de tais cruzamentos se tornassem pior que o pai que os gerou. Fazendo com 					que o algoritmo convergisse para um valor medio. Esse método não é o mais recomendado, por diminuir a capacidade de diversificação da população. O desempenho 				desse teste pode ser visualizado na imagem baixo_cruzamento.png. 
