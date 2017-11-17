@@ -6,8 +6,8 @@ import matplotlib.pyplot as plt
 offset = 1500
 
 # function domain
-min_domain = -600
-max_domain = 600
+min_domain = -512
+max_domain = 512
 
 class Cromossome:
 	def __init__(self, x1, x2,fitness):
@@ -61,6 +61,20 @@ def selection(population,pop_size):
 				selected_parents.append(i-1)
 	return selected_parents
 
+def normalize(c):
+	global min_domain
+	global max_domain
+	if(c.x1 < min_domain):
+		c.x1 = min_domain
+	if(c.x1 > max_domain):
+		c.x1 = max_domain
+	if(c.x2 < min_domain):
+		c.x2 = min_domain
+	if(c.x2 > max_domain):
+		c.x2 = max_domain
+	return c
+	
+
 def crossover(population, selected_parents, crossover_rate,elite,elite_bool):
 	sons = []
 	i = 0
@@ -80,6 +94,8 @@ def crossover(population, selected_parents, crossover_rate,elite,elite_bool):
 		else:
 			son1 = population[selected_parents[i]]
 			son2 = population[selected_parents[i+1]]
+		son1 = normalize(son1)
+		son2 = normalize(son2)
 		sons.append(son1)
 		sons.append(son2)
 		i = i+2
@@ -87,39 +103,41 @@ def crossover(population, selected_parents, crossover_rate,elite,elite_bool):
 	return sons
 
 def mutacao(population, mutation_rate):
+	global max_domain
+	global min_domain
 	for c in population:
 		if(random() < mutation_rate):
 			mutated_value = c.x1+uniform(-2.0,2.0)
-			if(not(mutated_value < -600)):
+			if(not(mutated_value < min_domain)):
 				c.x1 = mutated_value
 			else:
-				c.x1 = -600
-			if(not(mutated_value > 600)):
+				c.x1 = min_domain
+			if(not(mutated_value > max_domain)):
 				c.x1 = mutated_value
 			else:
-				c.x1 = 600
+				c.x1 = max_domain
 
 		if(random() < mutation_rate):
 			mutated_value = c.x2+uniform(-2.0,2.0)
-			if(not(mutated_value < -600)):
+			if(not(mutated_value < min_domain)):
 				c.x2 = mutated_value
 			else:
-				c.x2 = -600
-			if(not(mutated_value > 600)):
+				c.x2 = min_domain
+			if(not(mutated_value > max_domain)):
 				c.x2 = mutated_value
 			else:
-				c.x2 = 600
+				c.x2 = max_domain
 	return population
 
 def print_population(population):
 	for c in population:
 		print(str(c.x1)+" "+str(c.x2))
 
-pop_size = 1000
-crossover_rate = 0.2
-mutation_rate = 0.1
+pop_size = 500
+crossover_rate = 0.5
+mutation_rate = 0.13
 population = generate_population(pop_size)
-generations = 400
+generations = 200
 max_fitness_list = []
 mid_fitness_list = []
 min_fitness_list = []
@@ -136,8 +154,14 @@ for i in range(0,generations):
 	
 	# general process of ga
 	selected_parents = selection(population,pop_size)
-	population = crossover(population, selected_parents, crossover_rate,fitness_atribs[4],False)
+	population = crossover(population, selected_parents, crossover_rate,fitness_atribs[4],True)
 	population = mutacao(population,mutation_rate)
+
+# individuo com maior fitness
+
+print(fitness_atribs[4].x1)
+print(fitness_atribs[4].x2)
+print(fitness_atribs[4].fitness)
 
 # plot for statistical analysis
 plt.plot(max_fitness_list, label = 'Máximo fitness')
